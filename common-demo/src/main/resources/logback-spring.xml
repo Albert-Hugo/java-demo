@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false" scan="true" scanPeriod="1 seconds">
+
+    <include resource="logback-base.xml"/>
+
+    <springProfile name="local">
+        <root level="INFO">
+            <appender-ref ref="console"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="sit,uat,ver">
+        <root level="INFO">
+            <appender-ref ref="console"/>
+            <appender-ref ref="asyncInfoLog"/>
+            <appender-ref ref="asyncErrorLog"/>
+        </root>
+        <logger name="com.alibaba.cola" level="INFO"/>
+        <logger name="org.apache" level="WARN" />
+        <logger name="httpclient" level="WARN" />
+        <logger name="com.oppein" level="INFO"/>
+        <logger name="com.oppein.miop.msgcenter.repository.mapper" level="INFO" additivity="false"></logger>
+        <logger name="com.oppein.miop.msgcenter.pojo.executor" level="INFO" additivity="false"></logger>
+    </springProfile>
+
+    <springProfile name="prod">
+        <root level="INFO">
+            <appender-ref ref="console"/>
+            <appender-ref ref="asyncInfoLog"/>
+            <appender-ref ref="asyncErrorLog"/>
+        </root>
+    </springProfile>
+
+</configuration>

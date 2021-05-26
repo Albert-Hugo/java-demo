@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<included>
+    <contextName>logback</contextName>
+
+    <property scope="system" name="appName" value="miop-msgcenter"/>
+    <property scope="system" name="logDir" value="/apps/logs"/>
+    <property scope="system" name="consolePattern"
+              value="%date{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} [%file: %line] %msg%n"/>
+    <property scope="system" name="pattern"
+              value="%date{yyyy-MM-dd HH:mm:ss.SSS} [%X{source}] [%X{tid}] [%X{app}] [%thread] %-5level %logger{36} [%file: %line] %msg%n"/>
+
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${consolePattern}</pattern>
+        </encoder>
+    </appender>
+
+    <springProfile name="!local">
+        <appender name="infoFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${logDir}/${appName}/info.log</file>
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <fileNamePattern>${logDir}/${appName}/info.log.%d{yyyy-MM-dd}.zip</fileNamePattern>
+                <maxHistory>15</maxHistory>
+            </rollingPolicy>
+            <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+                <!--<layout class="org.apache.skywalking.apm.toolkit.log.logback.v1.x.TraceIdPatternLogbackLayout">-->
+                <layout class="com.oppein.miop.metrics.log.logback.mdc.AppMDCPatternLogbackLayout">
+                    <pattern>${pattern}</pattern>
+                </layout>
+                <charset>UTF-8</charset>
+            </encoder>
+        </appender>
+
+        <appender name="errorFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${logDir}/${appName}/error.log</file>
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <fileNamePattern>${logDir}/${appName}/error.log.%d{yyyy-MM-dd}.zip</fileNamePattern>
+                <maxHistory>15</maxHistory>
+            </rollingPolicy>
+            <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+                <layout class="com.oppein.miop.metrics.log.logback.mdc.AppMDCPatternLogbackLayout">
+                    <pattern>${pattern}</pattern>
+                </layout>
+                <charset>UTF-8</charset>
+            </encoder>
+            <filter class="ch.qos.logback.classic.filter.LevelFilter">
+                <level>ERROR</level>
+                <onMatch>ACCEPT</onMatch>
+                <onMismatch>DENY</onMismatch>
+            </filter>
+        </appender>
+
+        <appender name="asyncInfoLog" class="ch.qos.logback.classic.AsyncAppender">
+            <queueSize>1000</queueSize>
+            <maxFlushTime>3000</maxFlushTime>
+            <discardingThreshold>0</discardingThreshold>
+            <neverBlock>true</neverBlock>
+            <appender-ref ref="infoFile"/>
+        </appender>
+
+        <appender name="asyncErrorLog" class="ch.qos.logback.classic.AsyncAppender">
+            <queueSize>1000</queueSize>
+            <maxFlushTime>3000</maxFlushTime>
+            <discardingThreshold>0</discardingThreshold>
+            <neverBlock>true</neverBlock>
+            <appender-ref ref="errorFile"/>
+        </appender>
+    </springProfile>
+
+</included>

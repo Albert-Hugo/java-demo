@@ -1,0 +1,4 @@
+Agent-Class: com.example.agent.Agent
+Can-Redefine-Classes: true
+Can-Retransform-Classes: true
+Premain-Class: com.example.agent.Agent
